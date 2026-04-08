@@ -14,7 +14,10 @@ func main() {
 	// Example 1: Single cron expression (示例1：单个 cron 表达式)
 	fmt.Println("=== Example 1: Single Expression ===")
 	spec1 := "0 15 10 * * 1-5" // Weekdays at 10:15 AM (工作日上午10:15)
-	times1 := cronnextzh.P带秒数的表达式解析器.Get获取未来N天内的执行时间(spec1, time.Now(), 7)
+	times1, err := cronnextzh.P带秒数的表达式解析器.Get获取未来N天内的执行时间(spec1, time.Now(), 7)
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Printf("Expression: %s\n", spec1)
 	fmt.Printf("Next %d execution times:\n", len(times1))
@@ -29,7 +32,10 @@ func main() {
 		"0 0 14 * * 1-5",  // Weekdays at 2:00 PM (工作日下午2:00)
 		"0 30 18 * * 1-5", // Weekdays at 6:30 PM (工作日下午6:30)
 	}
-	times2 := cronnextzh.P带秒数的表达式解析器.Get计算未来N天内的执行时间(specs2, time.Now(), 3)
+	times2, err := cronnextzh.P带秒数的表达式解析器.Get计算未来N天内的执行时间(specs2, time.Now(), 3)
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Printf("Expressions: %v\n", specs2)
 	fmt.Printf("Combined next %d execution times (sorted):\n", len(times2))
@@ -40,7 +46,10 @@ func main() {
 	// Example 3: Using minute-precision parser (示例3：使用分钟精度解析器)
 	fmt.Println("\n=== Example 3: Minute-Precision Parser ===")
 	spec3 := "15 10 * * 1-5" // 5-field format: Weekdays at 10:15 (5字段格式：工作日10:15)
-	times3 := cronnextzh.P只到分的表达式解析器.Get获取未来N天内的执行时间(spec3, time.Now(), 5)
+	times3, err := cronnextzh.P只到分的表达式解析器.Get获取未来N天内的执行时间(spec3, time.Now(), 5)
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Printf("Expression: %s (5-field format)\n", spec3)
 	fmt.Printf("Next %d execution times:\n", len(times3))

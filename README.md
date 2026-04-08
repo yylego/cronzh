@@ -78,11 +78,15 @@ func main() {
 
 	// Display future execution schedule (显示未来执行计划)
 	fmt.Println("=== Scheduled Tasks for Next 7 Days ===")
-	taskList.Debug(cronnextzh.P带秒数的表达式解析器, 7)
+	if err := taskList.Debug(cronnextzh.P带秒数的表达式解析器, 7); err != nil {
+		panic(err)
+	}
 
 	// Register and run the cron scheduler (注册并运行定时调度器)
 	cron := cronv3.New(cronv3.WithSeconds())
-	taskList.Set注册定时任务(cron)
+	if err := taskList.Set注册定时任务(cron); err != nil {
+		panic(err)
+	}
 	cron.Start()
 
 	// Run for 10 seconds to demonstrate (演示运行10秒)
@@ -189,7 +193,10 @@ func main() {
 	// Example 1: Single cron expression (示例1：单个 cron 表达式)
 	fmt.Println("=== Example 1: Single Expression ===")
 	spec1 := "0 15 10 * * 1-5" // Weekdays at 10:15 AM (工作日上午10:15)
-	times1 := cronnextzh.P带秒数的表达式解析器.Get获取未来N天内的执行时间(spec1, time.Now(), 7)
+	times1, err := cronnextzh.P带秒数的表达式解析器.Get获取未来N天内的执行时间(spec1, time.Now(), 7)
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Printf("Expression: %s\n", spec1)
 	fmt.Printf("Next %d execution times:\n", len(times1))
@@ -204,7 +211,10 @@ func main() {
 		"0 0 14 * * 1-5",  // Weekdays at 2:00 PM (工作日下午2:00)
 		"0 30 18 * * 1-5", // Weekdays at 6:30 PM (工作日下午6:30)
 	}
-	times2 := cronnextzh.P带秒数的表达式解析器.Get计算未来N天内的执行时间(specs2, time.Now(), 3)
+	times2, err := cronnextzh.P带秒数的表达式解析器.Get计算未来N天内的执行时间(specs2, time.Now(), 3)
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Printf("Expressions: %v\n", specs2)
 	fmt.Printf("Combined next %d execution times (sorted):\n", len(times2))
@@ -215,7 +225,10 @@ func main() {
 	// Example 3: Using minute-precision parser (示例3：使用分钟精度解析器)
 	fmt.Println("\n=== Example 3: Minute-Precision Parser ===")
 	spec3 := "15 10 * * 1-5" // 5-field format: Weekdays at 10:15 (5字段格式：工作日10:15)
-	times3 := cronnextzh.P只到分的表达式解析器.Get获取未来N天内的执行时间(spec3, time.Now(), 5)
+	times3, err := cronnextzh.P只到分的表达式解析器.Get获取未来N天内的执行时间(spec3, time.Now(), 5)
+	if err != nil {
+		panic(err)
+	}
 
 	fmt.Printf("Expression: %s (5-field format)\n", spec3)
 	fmt.Printf("Next %d execution times:\n", len(times3))
@@ -247,8 +260,8 @@ type P表达式解析器 cron.Parser
 **Main Methods:**
 
 - `New(parser cron.Parser) *P表达式解析器` - Create custom parser
-- `Get获取未来N天内的执行时间(spec string, since time.Time, nDate int) []time.Time` - Calculate execution times given a single expression
-- `Get计算未来N天内的执行时间(specs []string, since time.Time, nDate int) []time.Time` - Calculate execution times given multiple expressions (sorted)
+- `Get获取未来N天内的执行时间(spec string, since time.Time, nDate int) ([]time.Time, error)` - Calculate execution times given a single expression
+- `Get计算未来N天内的执行时间(specs []string, since time.Time, nDate int) ([]time.Time, error)` - Calculate execution times given multiple expressions (sorted)
 
 #### crontaskzh - Task List Management
 
@@ -267,8 +280,8 @@ type S定时任务列表 []*T定时任务
 **Main Methods:**
 
 - `NewS定时任务列表(s定时任务列表 []*T定时任务) S定时任务列表` - Create new task list
-- `Set注册定时任务(cron *cron.Cron)` - Add all tasks to the cron instance
-- `Debug(p表达式解析器 *cronnextzh.P表达式解析器, nDate int)` - Show the future execution schedule
+- `Set注册定时任务(cron *cron.Cron) error` - Add all tasks to the cron instance
+- `Debug(p表达式解析器 *cronnextzh.P表达式解析器, nDate int) error` - Show the future execution schedule
 
 ## Cron Expression Format
 

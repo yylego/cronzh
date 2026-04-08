@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/robfig/cron/v3"
-	"github.com/yylego/rese"
+	"github.com/yylego/erero"
 	"github.com/yylego/sortx"
 	"github.com/yylego/timezh"
 )
@@ -52,16 +52,19 @@ func New(parser cron.Parser) *P表达式解析器 {
 // since: 起始时间点
 // nDate: 向前查找的天数
 // 返回表示所有执行时间的 time.Time 切片
-func (P *P表达式解析器) Get获取未来N天内的执行时间(spec string, since time.Time, nDate int) []time.Time {
+func (P *P表达式解析器) Get获取未来N天内的执行时间(spec string, since time.Time, nDate int) ([]time.Time, error) {
 	p解析器 := (*cron.Parser)(P)
-	s时刻表 := rese.V1(p解析器.Parse(spec))
+	s时刻表, err := p解析器.Parse(spec)
+	if err != nil {
+		return nil, erero.WithMessage(err, "cron 表达式解析失败")
+	}
 	v执行时间 := since
 	e结束时间 := timezh.TS.D日期.Get转字符串(since.AddDate(0, 0, nDate))
 	var result []time.Time
 	for {
 		v执行时间 = s时刻表.Next(v执行时间)
 		if timezh.TS.D日期.Get转字符串(v执行时间) > e结束时间 {
-			return result
+			return result, nil
 		}
 		result = append(result, v执行时间)
 	}
@@ -78,14 +81,17 @@ func (P *P表达式解析器) Get获取未来N天内的执行时间(spec string,
 // since: 起始时间点
 // nDate: 向前查找的天数
 // 返回排序后的 time.Time 切片，包含所有表达式的所有执行时间
-func (P *P表达式解析器) Get计算未来N天内的执行时间(specs []string, since time.Time, nDate int) []time.Time {
+func (P *P表达式解析器) Get计算未来N天内的执行时间(specs []string, since time.Time, nDate int) ([]time.Time, error) {
 	var result []time.Time
 	for _, spec := range specs {
-		res := P.Get获取未来N天内的执行时间(spec, since, nDate)
+		res, err := P.Get获取未来N天内的执行时间(spec, since, nDate)
+		if err != nil {
+			return nil, erero.WithMessage(err, "计算执行时间失败")
+		}
 		result = append(result, res...)
 	}
 	sortx.SortVStable(result, func(a, b time.Time) bool {
 		return a.Before(b)
 	})
-	return result
+	return result, nil
 }

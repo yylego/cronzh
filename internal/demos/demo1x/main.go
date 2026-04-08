@@ -34,11 +34,15 @@ func main() {
 
 	// Display future execution schedule (显示未来执行计划)
 	fmt.Println("=== Scheduled Tasks for Next 7 Days ===")
-	taskList.Debug(cronnextzh.P带秒数的表达式解析器, 7)
+	if err := taskList.Debug(cronnextzh.P带秒数的表达式解析器, 7); err != nil {
+		panic(err)
+	}
 
 	// Register and run the cron scheduler (注册并运行定时调度器)
 	cron := cronv3.New(cronv3.WithSeconds())
-	taskList.Set注册定时任务(cron)
+	if err := taskList.Set注册定时任务(cron); err != nil {
+		panic(err)
+	}
 	cron.Start()
 
 	// Run for 10 seconds to demonstrate (演示运行10秒)
